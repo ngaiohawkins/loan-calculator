@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Calculator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <style>
+        .ibm-plex-sans {
+            font-family: "IBM Plex Sans", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-variation-settings:
+                "wdth"100;
+        }
+
+        /* Chrome, Safari, Edge, Opera */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /*Page Styling*/
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: "IBM Plex Sans", sans-serif;
+            background-color: #FFFDFA;
+            color: #2E1B46;
+        }
+
+        p {
+            font-size: 20px;
+        }
+
+        label {
+            font-size: 20px;
+        }
+
+        #flex {
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Calculator */
+        #calculator {
+            display: flex;
+            justify-content: center;
+        }
+
+        fieldset {
+            margin: 1em 0;
+            padding: 1em 2em;
+            border: solid 1px #2E1B46;
+            border-radius: 10px;
+            min-width: 450px;
+        }
+
+        legend {
+            font-size: 36px;
+            font-weight: 600;
+            padding: 0 .25em;
+            color: #2E1B46;
+        }
+
+        #result-box {
+            border: 2px solid #2E1B46;
+            font-weight: bold;
+            max-width: 400px;
+            padding: 5px;
+            border-radius: 5px;
+            background-color: #2E1B46;
+            color: white;
+        }
+
+        #P {
+            max-width: 100px;
+            font-family: "IBM Plex Sans", sans-serif;
+            border-radius: 5px;
+            border-width: 0.5px;
+            font-size: 20px;
+            padding: 2px 5px 2px 5px;
+        }
+
+        #n {
+            max-width: 100px;
+            font-family: "IBM Plex Sans", sans-serif;
+            border-radius: 5px;
+            border-width: 0.5px;
+            font-size: 20px;
+            padding: 2px 5px 2px 5px;
+        }
+
+        #i {
+            max-width: 100px;
+            font-family: "IBM Plex Sans", sans-serif;
+            border-radius: 5px;
+            border-width: 0.5px;
+            font-size: 20px;
+            padding: 2px 5px 2px 5px;
+        }
+
+        .suffix {
+            font-size: 20px;
+        }
+
+        /*Results*/
+        #result-numbers {
+            padding-right: 75px;
+            padding-left: 10px;
+            align-content: center;
+            border-right: solid 1px #dcdcdc;
+        }
+
+        #results-box {
+            display: flex;
+            margin-left: 50px;
+            max-width: 700px;
+            min-width: 650px;
+            padding: 10px;
+            border: solid 1px #2E1B46;
+            border-radius: 10px;
+        }
+
+        #loan-text {
+            line-height: 3px;
+        }
+
+        #loan-result {
+            font-weight: bold;
+        }
+
+        #interest-text {
+            line-height: 3px;
+            padding-top: 15px;
+        }
+
+        #interest-result {
+            font-weight: bold;
+        }
+
+        #paid-text {
+            line-height: 3px;
+            padding-top: 15px;
+        }
+
+        #paid-result {
+            font-weight: bold;
+        }
+
+        /*Pie Chart*/
+        #myChart {
+            max-width: 350px;
+            max-height: 350px;
+            margin-left: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="flex">
+        <form id="calculator" oninput="displayResult(); displayInterest(); displayTotal(); displayLoan(); updateChart()">
+            <fieldset>
+                <!--<legend>Estimate your payment</legend>-->
+                <label for="P">Loan amount: </label>
+                <input type="number" id="P" style="text-align: center;" value="">
+                <br><br>
+    
+                <label for="n">Loan term: </label>
+                <input type="number" id="n" style="text-align: center;" value="">
+                <span class="suffix">months</span>
+                <br><br>
+    
+                <label for="i">Interest rate: </label>
+                <input type="number" id="i" style="text-align: center;" value="">
+                <span class="suffix">%</span>
+                <br><br>
+    
+                <p id="result-box">Estimated monthly payment: <output id="result"></output></p>
+            </fieldset>
+        </form>
+
+        <div id="results-box">
+            <div id="result-numbers">
+                <p id="loan-text">Loan amount paid:</p>
+                <p>$<output id="loan-result"></output></p>
+                <p id="interest-text">Total interest paid:</p>
+                <p>$<output id="interest-result"></output></p>
+                <p id="paid-text">Total cost of loan:</p>
+                <p>$<output id="paid-result"></output></p>
+            </div>
+        
+            <div id="chart">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    /*Display Results*/
+    function calculate() {
+        var P_id = document.getElementById('P');
+        var i_id = document.getElementById('i');
+        var n_id = document.getElementById('n');
+
+        var P = P_id.value; /* Principal */
+        var n = n_id.value; /* Number of payments (in months) */
+        var i = (i_id.value / 100)/12; /* Monthly interest */
+
+        return (P * ((i * Math.pow((1 + i), n)) / (Math.pow((1 + i), n) - 1))).toFixed(2);
+    }
+
+    function displayResult() {
+        var total = calculate();
+        var result = document.getElementById('result');
+        result.textContent = total;
+    }
+
+    function displayLoan() {
+        var P_id = document.getElementById('P');
+        var P = P_id.value;
+
+        var result_loan = document.getElementById('loan-result');
+        result_loan.textContent = P;
+        return P;
+    }
+
+    function displayTotal() {
+        var result_id = document.getElementById('result');
+        var n_id = document.getElementById('n');
+        var result = result_id.value;
+        var n = n_id.value;
+
+        var result_total = document.getElementById('paid-result');
+        result_total.textContent = (result * n).toFixed(2);
+        return (result * n).toFixed(2);
+    }
+
+    function displayInterest() {
+        var result_id = document.getElementById('result');
+        var n_id = document.getElementById('n');
+        var result = result_id.value;
+        var n = n_id.value;
+        var P_id = document.getElementById('P');
+        var P = P_id.value;
+
+        var result_interest = document.getElementById('interest-result');
+        result_interest.textContent = ((result * n) - P).toFixed(2);
+        return ((result * n) - P).toFixed(2);
+    }
+
+    window.onload = function () {
+        document.getElementById("calculator").reset();
+        document.getElementById("interest-result").value = 0;
+        document.getElementById("paid-result").value = 0;
+        document.getElementById("loan-result").value = 0;
+    };
+
+    /*Pie Chart*/
+    const ctx = document.getElementById('myChart');
+
+    const myChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Total interest', 'Total amount paid'],
+            datasets: [{
+                label: 'Cost',
+                data: [displayInterest(), displayTotal()],
+                backgroundColor: [
+                    'rgba(46, 27, 70, 1)',
+                    'rgba(242, 238, 247, 1)'
+                ],
+                hoverOffset: 5
+            }]
+        },
+    });
+
+    function updateChart() {
+        var updateValues = [displayInterest(), displayTotal()];
+        myChart.data.datasets[0].data = updateValues;
+        myChart.update();
+    }
+</script>
