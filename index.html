@@ -42,6 +42,7 @@
 
         p {
             font-size: 20px;
+            color: #2E1B46;
         }
 
         label {
@@ -50,6 +51,7 @@
 
         #flex {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
         }
 
@@ -161,8 +163,8 @@
 
         /*Pie Chart*/
         #myChart {
-            max-width: 350px;
-            max-height: 350px;
+            max-width: 300px;
+            max-height: 300px;
             margin-left: 50px;
         }
     </style>
@@ -194,11 +196,11 @@
         <div id="results-box">
             <div id="result-numbers">
                 <p id="loan-text">Loan amount paid:</p>
-                <p>$<output id="loan-result"></output></p>
+                <p><output id="loan-result"></output></p>
                 <p id="interest-text">Total interest paid:</p>
-                <p>$<output id="interest-result"></output></p>
+                <p><output id="interest-result"></output></p>
                 <p id="paid-text">Total cost of loan:</p>
-                <p>$<output id="paid-result"></output></p>
+                <p><output id="paid-result"></output></p>
             </div>
         
             <div id="chart">
@@ -228,47 +230,76 @@
     function displayResult() {
         var total = calculate();
         var result = document.getElementById('result');
-        result.textContent = total;
+
+        var formattedResult = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+        }).format(total);
+
+        if (isNaN(calculate()) == false) {
+            result.textContent = formattedResult; /*Estimated monthly payment*/
+        }
     }
 
     function displayLoan() {
         var P_id = document.getElementById('P');
         var P = P_id.value;
 
+        var formattedResult = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+        }).format(P);
+
         var result_loan = document.getElementById('loan-result');
-        result_loan.textContent = P;
-        return P;
+        if (isNaN(P) == false) {
+            result_loan.textContent = formattedResult;
+            return P; /*Loan amount*/
+        }
     }
 
     function displayTotal() {
-        var result_id = document.getElementById('result');
+        //var result_id = document.getElementById('result');
         var n_id = document.getElementById('n');
-        var result = result_id.value;
+        //var result = result_id.value;
         var n = n_id.value;
 
+        var formattedResult = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+        }).format((calculate() * n).toFixed(2));
+
         var result_total = document.getElementById('paid-result');
-        result_total.textContent = (result * n).toFixed(2);
-        return (result * n).toFixed(2);
+        if (isNaN(calculate()) == false) {
+            result_total.textContent = formattedResult;
+            return (calculate() * n).toFixed(2); /*Loan amount + interest*/
+        }
     }
 
     function displayInterest() {
-        var result_id = document.getElementById('result');
+        //var result_id = document.getElementById('result');
         var n_id = document.getElementById('n');
-        var result = result_id.value;
+        //var result = result_id.value;
         var n = n_id.value;
         var P_id = document.getElementById('P');
         var P = P_id.value;
 
+        var formattedResult = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+        }).format(((calculate() * n) - P).toFixed(2));
+
         var result_interest = document.getElementById('interest-result');
-        result_interest.textContent = ((result * n) - P).toFixed(2);
-        return ((result * n) - P).toFixed(2);
+        if (isNaN(calculate()) == false) {
+            result_interest.textContent = formattedResult;
+            return ((calculate() * n) - P).toFixed(2); /*Total interest*/
+        }
     }
 
     window.onload = function () {
         document.getElementById("calculator").reset();
-        document.getElementById("interest-result").value = 0;
-        document.getElementById("paid-result").value = 0;
-        document.getElementById("loan-result").value = 0;
+        document.getElementById("interest-result").value = "$0";
+        document.getElementById("paid-result").value = "$0";
+        document.getElementById("loan-result").value = "$0";
     };
 
     /*Pie Chart*/
